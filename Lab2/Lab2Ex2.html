@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lab2Ex2</title>
+<style>
+    body {
+        background-color: #DDDDDD;
+    }
+    canvas {
+        background-color: white;
+        display: block;
+    }
+    #canvasholder {
+        border:2px solid black;
+        float: left;
+		cursor: crosshair;
+    }
+</style>
+<script>
+    "use strict";  
+	
+    var canvas;    
+    var graphics; 
+    
+    function randomColorString() {
+        var r = Math.floor(256*Math.random());
+        var g = Math.floor(256*Math.random());
+        var b = Math.floor(256*Math.random());
+        return "rgb(" + r + "," + g + "," + b + ")";
+    }
+        function addGraphicsContextExtras(graphics) {
+        graphics.strokeLine = function(x1,y1,x2,y2) {
+           this.beginPath();
+           this.moveTo(x1,y1);
+           this.lineTo(x2,y2);
+           this.stroke();
+        }
+    }
+	// funkcja czyszcząca canvas
+    function clear() {
+        graphics.clearRect(0, 0, canvas.width, canvas.height);
+    }
+   
+    function mouseHandler() {
+
+        var dragging = false;
+        var startX, startY;    
+        var prevX, prevY;      
+        
+        var shapeColor;  
+                          
+        var shapeType;
+		
+        // funkcja wywoływana gdy użytkownik przyciska lewy przycisk myszy
+        function doMouseDown(event) {
+
+            if (dragging) {
+                return;
+            }
+            if (event.button != 0) {
+                return;  // tylko lewy przycisk myszy
+            }
+            var x,y; // pozycja myszy w canvas
+            var r = canvas.getBoundingClientRect();
+            x = Math.round(event.clientX - r.left);
+            y = Math.round(event.clientY - r.top);   
+            dragging = true;
+            startX = prevX = x;
+            startY = prevY = y;
+            document.addEventListener("mousemove", doMouseMove, false);
+            document.addEventListener("mouseup", doMouseUp, false);
+            shapeColor = Number(document.getElementById("shapeColor").value);
+            shapeType = Number(document.getElementById("shapeType").value);
+        }
+        // funkcja wywoływana gdy użytkownik przesuwa mysz
+        function doMouseMove(event) {
+            if (!dragging) {
+                return;  
+            }
+            var x,y;  
+            var r = canvas.getBoundingClientRect();
+            x = Math.round(event.clientX - r.left);  
+            y = Math.round(event.clientY - r.top);
+            
+            const dx = x - prevX;
+			const dy = y - prevY;
+			if (Math.sqrt(dx*dx + dy*dy) < 3) {
+			return;
+			}
+                
+            const colors = ["random", "red", "green", "blue", "#28c7c9"];
+
+			if (colors[shapeColor] === "random") {
+			graphics.fillStyle = randomColorString();
+			} else {
+			graphics.fillStyle = colors[shapeColor];
+			}
+            
+            switch (shapeType) {
+            case 0:
+                graphics.fillRect(x-20, y-20, 40, 40);
+                graphics.strokeRect(x-20, y-20, 40, 40);
+                break;
+
+            case 1: {
+                const size = 20;
+
+				graphics.beginPath();
+				graphics.moveTo(x, y - size);
+				graphics.lineTo(x - size, y + size);
+				graphics.lineTo(x + size, y + size); 
+				graphics.closePath();
+
+				graphics.fill();
+				graphics.stroke();
+				break;
+            }
+        }
+            
+            prevX = x;
+            prevY = y;
+        }
+        // funkcja wywoływana gdy przycisk nie jest już wciśnięty
+        function doMouseUp(event) {
+            if (!dragging) {
+                return;
+            }
+            dragging = false;
+            document.removeEventListener("mousemove", doMouseMove, false);
+            document.removeEventListener("mouseup", doMouseUp, false);
+         }
+         
+         canvas.addEventListener("mousedown", doMouseDown, false);
+
+   } 
+       
+    function init() {
+		canvas = document.getElementById("canvas");
+		graphics = canvas.getContext("2d");
+		addGraphicsContextExtras(graphics);
+        mouseHandler();
+        graphics.fillStyle = "white";
+        graphics.fillRect(0,0,canvas.width,canvas.height);
+    }
+    
+</script>
+</head>
+<body onload="init()">
+
+<h2>Lab 2, Exercise 2</h2>
+
+<p><b>Color:</b>
+    <select id="shapeColor">
+        <option value="0" selected="selected">Random</option>
+        <option value="1">Red</option>
+        <option value="2">Green</option>
+        <option value="3">Blue</option>
+        <option value="4">Turquoise</option>
+    </select>
+</p>
+
+<div>
+    <b>Drawing:</b>
+    <select id="shapeType">
+        <option value="0">Square</option>
+        <option value="1">Triangle</option>
+    </select>
+</div>
+
+<div>
+    <button onclick="init()" type="button" id="clearButton">Clear</button>
+</div>
+
+<div id="canvasholder">
+	<canvas id="canvas" width="800" height="600">
+	Canvas not supported.
+	</canvas>
+</div>
+</body></html>

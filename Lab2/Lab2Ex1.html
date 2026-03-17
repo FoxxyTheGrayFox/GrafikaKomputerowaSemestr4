@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lab1Ex1</title>
+<style>
+    body {
+        background-color: #DDDDDD;
+    }
+    canvas {
+        background-color: white;
+        display: block;
+    }
+    #canvasholder {
+        border:2px solid black;
+        float: left;
+    }
+</style>
+<script>
+"use strict";
+
+var canvas;
+var graphics;
+
+function addGraphicsContextExtras(graphics) {
+    graphics.strokeLine = function(x1,y1,x2,y2) {
+        this.beginPath();
+        this.moveTo(x1,y1);
+        this.lineTo(x2,y2);
+        this.stroke();
+    }
+    graphics.fillCircle = function(x,y,r) {
+        this.beginPath();
+        this.arc(x,y,r,0,2*Math.PI,false);
+        this.fill();
+    }
+    graphics.strokeCircle = function(x,y,r) {
+        this.beginPath();
+        this.arc(x,y,r,0,2*Math.PI,false);
+        this.stroke();
+    }
+}
+
+function draw() {
+
+    // prostokąt
+    graphics.fillStyle = "#28c7c9";
+    graphics.strokeStyle = "#000000";
+    graphics.lineWidth = 4;
+    graphics.beginPath();
+    graphics.rect(80,150,440,260);
+    graphics.fill();
+    graphics.stroke();
+
+    // oczy
+    graphics.lineWidth = 1;
+    graphics.fillStyle = "#ffffff";
+    graphics.strokeStyle = "#ffffff";
+
+    graphics.fillCircle(180,230,30);
+    graphics.strokeCircle(180,230,30);
+
+    graphics.fillCircle(420,230,30);
+    graphics.strokeCircle(420,230,30);
+
+    // źrenice
+    graphics.fillStyle = "#000000";
+    graphics.fillCircle(180,230,18);
+    graphics.fillCircle(420,230,18);
+
+    // odbłyski w oczach
+    graphics.fillStyle = "#ffffff";
+    graphics.fillCircle(172,222,7);
+    graphics.fillCircle(412,222,7);
+
+	// usta
+    graphics.beginPath();
+    graphics.fillStyle = "#000000";
+    graphics.strokeStyle = "#000000";
+    graphics.moveTo(230, 315);
+    graphics.bezierCurveTo(230, 350, 370, 350, 370, 315);
+    graphics.bezierCurveTo(330, 400, 270, 400, 230, 315);
+    graphics.fill();
+    graphics.stroke();
+    graphics.moveTo(205, 325);
+    graphics.bezierCurveTo(205, 325, 225, 330, 230, 295);
+    graphics.bezierCurveTo(230, 295, 235, 335, 205, 325);
+    graphics.fill(); 
+    graphics.stroke(); 
+    graphics.moveTo(395, 325);
+    graphics.bezierCurveTo(395, 325, 375, 330, 370, 295);
+    graphics.bezierCurveTo(370, 295, 365, 335, 395, 325);
+    graphics.fill(); 
+    graphics.stroke(); 
+	// zęby
+    graphics.beginPath();
+    graphics.strokeStyle = "#000000";
+	graphics.fillStyle = "#ffffff";
+	graphics.moveTo(280, 340);
+	graphics.lineTo(300, 340);
+    graphics.lineTo(300, 360);
+    graphics.lineTo(280, 360);
+    graphics.lineTo(280, 350);
+    graphics.fill();
+	graphics.stroke(); 
+    graphics.moveTo(300, 340);
+    graphics.lineTo(320, 340);
+    graphics.lineTo(320, 360);
+    graphics.lineTo(300, 360);
+    graphics.lineTo(300, 350);
+    graphics.fill();
+	graphics.stroke(); 
+	graphics.closePath();
+}
+
+function init() {
+    canvas = document.getElementById("canvas");
+    graphics = canvas.getContext("2d");
+    addGraphicsContextExtras(graphics);
+    draw();
+}
+</script>
+</head>
+<body onload="init()">
+	<h2>CS 424, Lab 2, Exercise 1</h2>
+    <div id="canvasholder">
+        <canvas id="canvas" width="600" height="600">
+            Canvas not supported.
+        </canvas>
+    </div>
+</body>
+</html>

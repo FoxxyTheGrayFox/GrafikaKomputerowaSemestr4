@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkerboard</title>
+	<style>
+    body {
+        background-color: #DDDDDD;
+    }
+</style>
+<script>
+function draw() {
+    const canvas = document.getElementById("checkerboard");
+    const graphics = canvas.getContext("2d");
+
+    const size = 400; // rozmiar canvas
+    const squares = 8; // liczba pól w rzędzie
+    const squareSize = size / squares; // rozmiar jednego pola
+
+    canvas.width = size;
+    canvas.height = size;
+
+    for (let row = 0; row < squares; row++) {
+        for (let col = 0; col < squares; col++) {
+
+            // zmieniaj kolor pola dla parzystych i nieparzystych
+            if ((row + col) % 2 === 0) {
+                graphics.fillStyle = "white";
+            } else {
+                graphics.fillStyle = "black";
+            }
+
+            // pole szachownicy
+            graphics.fillRect(
+                col * squareSize, // x-pos
+                row * squareSize, // y-pos
+                squareSize,       // szerokość
+                squareSize        // wysokość
+            );
+        }
+    }
+}
+window.onload = draw; // wywołanie funkcji
+</script>
+</head>
+<body>
+<h2>Checkerboard</h2>
+<canvas id="checkerboard"></canvas>
+</body>
+</html>
