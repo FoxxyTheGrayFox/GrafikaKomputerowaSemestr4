@@ -1,0 +1,55 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <!-- trójkat wg wariantu -->
+    <polygon id="triangle" points="0,-30 30,30 -30,30" fill="none" stroke="black"/>
+  </defs>
+  <!-- fioletowy z lewej -->
+  <g transform="translate(150,120) rotate(15)">
+    <!-- czerwona belka -->
+    <rect x="-80" y="-5" width="160" height="10" fill="red"/>
+    <!-- trójkąt z lewej -->
+    <g transform="translate(-80,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+    <!-- trójkąt z prawej -->
+    <g transform="translate(80,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+  </g>
+  <!-- podpora -->
+  <polygon points="150,125 130,200 170,200" fill="purple"/>
+  <!-- zielony z prawej -->
+  <g transform="translate(450,100) rotate(15)">
+    <rect x="-70" y="-5" width="140" height="10" fill="red"/>
+    <g transform="translate(-70,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="-360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+    <g transform="translate(70,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="-360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+  </g>
+  <polygon points="450,105 430,180 470,180" fill="green"/>
+  <!-- niebieski w środku -->
+  <g transform="translate(300,300) rotate(15)">
+    <rect x="-100" y="-5" width="200" height="10" fill="red"/>
+    <g transform="translate(-100,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+    <g transform="translate(100,0)">
+      <use href="#triangle">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite"/>
+      </use>
+    </g>
+  </g>
+  <polygon points="300,305 270,420 330,420" fill="blue"/>
+</svg>
