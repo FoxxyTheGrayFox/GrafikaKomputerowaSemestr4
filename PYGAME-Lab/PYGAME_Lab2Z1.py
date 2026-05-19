@@ -1,65 +1,97 @@
 import pygame
-import sys
+import numpy as np
 
 pygame.init()
 
-width = 600
-height = 600
-win = pygame.display.set_mode((width, height))
+WIDTH, HEIGHT = 800, 800
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Zadanie 1")
+BLACK = (0, 0, 0)
+img = pygame.image.load("obraz.jpg").convert_alpha()
+img = pygame.transform.scale(img, (WIDTH // 2, HEIGHT // 3))
 
-CZARNY = (0, 0, 0)
+def shear(surface, sx=0, sy=0):
+    pixels = pygame.surfarray.array3d(surface)
+    w, h = surface.get_size()
 
-image = pygame.image.load("obraz.jpg").convert_alpha()
-image = pygame.transform.smoothscale(image, (100, 100))
+    new_w = w + int(abs(sx) * h)
+    new_h = h + int(abs(sy) * w)
 
-def center(surface, offset_x=0, offset_y=0):
-    win.fill(CZARNY)
-    win.blit(surface, ((width - surface.get_width()) // 2 + offset_x,(height - surface.get_height()) // 2 + offset_y))
+    output = np.zeros((new_w, new_h, 3), dtype=np.uint8)
 
-run = True
-while run:
+    for y in range(h):
+        dx = int(sx * (h - y))
+
+        for x in range(w):
+            dy = int(sy * x)
+            output[x + dx, y + dy] = pixels[x, y]
+
+    result = pygame.surfarray.make_surface(output)
+    final_surface = pygame.Surface(result.get_size())
+
+    final_surface.fill(BLACK)
+    result.set_colorkey(BLACK)
+    final_surface.blit(result, (0, 0))
+
+    return final_surface
+
+def variant(n):
+    match n:
+        case 1:
+            return pygame.transform.smoothscale_by(img, 0.5)
+        case 2:
+            return pygame.transform.rotate(img, -45)
+        case 3:
+            temp = pygame.transform.flip(img, False, True)
+            return pygame.transform.smoothscale_by(temp, (0.6, 1.5))
+        case 4:
+            temp = pygame.transform.flip(img, True, False)
+            temp = shear(temp, 0.4)
+            return pygame.transform.flip(temp, True, False)
+        case 5:
+            return pygame.transform.smoothscale_by(img, (1.5, 0.6))
+        case 6:
+            temp = pygame.transform.flip(img, True, False)
+            temp = shear(temp, 0.4)
+            temp = pygame.transform.rotate(temp, 90)
+            return pygame.transform.flip(temp, True, False)
+        case 7:
+            temp = pygame.transform.flip(img, False, True)
+            temp = pygame.transform.smoothscale_by(temp, (0.6, 1.5))
+            return pygame.transform.flip(temp, True, False)
+        case 8:
+            temp = pygame.transform.smoothscale_by(img, (1.5, 0.6))
+            return pygame.transform.rotate(temp, -20)
+        case 9:
+            temp = pygame.transform.flip(img, True, True)
+            return shear(temp, 0, 0.4)
+    return img
+
+current = 1
+current_img = variant(current)
+running = True
+
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
-
+            running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_1:
-                scaled = pygame.transform.smoothscale(image,(int(width * 0.35), int(height * 0.35)))
-                center(scaled)
-            elif event.key == pygame.K_2:
-                rotated = pygame.transform.rotate(image, 45)
-                center(rotated)
-            elif event.key == pygame.K_3:
-                flipped = pygame.transform.flip(image, 0, 1)
-                center(flipped)
-            elif event.key == pygame.K_4:
-                scale = pygame.transform.smoothscale(image,(int(width * 0.35), height))
-                rotozoom = pygame.transform.rotozoom(scale, 45, 1)
-                center(rotozoom)
-            elif event.key == pygame.K_5:
-                top_scaled = pygame.transform.smoothscale(image,(width, int(height * 0.35)))
-                center(top_scaled, 0, -height // 2 + top_scaled.get_height() // 2)
-            elif event.key == pygame.K_6:
-                scaled_2 = pygame.transform.smoothscale(image,(int(width * 0.35), height))
-                rotozoom = pygame.transform.rotozoom(scaled_2, 180, 1)
-                center(rotozoom)
-            elif event.key == pygame.K_7:
-                scaled_3 = pygame.transform.smoothscale(image,(int(width * 0.5), height))
-                flipped = pygame.transform.flip(scaled_3, 1, 0)
-                center(flipped)
-            elif event.key == pygame.K_8:
-                scaled_4 = pygame.transform.smoothscale(image,(width, int(height * 0.4)))
-                rotated_2 = pygame.transform.rotate(scaled_4, -20)
-                center(rotated_2,int((width - rotated_2.get_width()) * 0.2),int((height - rotated_2.get_height()) * 0.5) )
-            elif event.key == pygame.K_9:
-                scaled_5 = pygame.transform.smoothscale(image,(int(width * 0.35), height))
-                rotozoom = pygame.transform.rotozoom(scaled_5, 90, 1)
-                center(rotozoom, 250 // 2)
-            else:
-                win.fill(CZARNY)
+            if pygame.K_1 <= event.key <= pygame.K_9:
+                current = event.key - pygame.K_0
+                current_img = variant(current)
+    screen.fill(BLACK)
 
+    if current == 5:
+        rect = current_img.get_rect(topleft=(WIDTH // 8, 0))
+    elif current == 8:
+        rect = current_img.get_rect(
+            midbottom=(WIDTH // 2.2, HEIGHT - HEIGHT // 30)
+        )
+    elif current == 9:
+        rect = current_img.get_rect(topright=(WIDTH, HEIGHT // 3))
+    else:
+        rect = current_img.get_rect(center=screen.get_rect().center)
+    screen.blit(current_img, rect)
     pygame.display.update()
 
 pygame.quit()
-sys.exit()
