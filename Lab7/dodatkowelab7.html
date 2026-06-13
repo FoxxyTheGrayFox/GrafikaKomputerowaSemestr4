@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sinusoida</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const vs = `
+      varying vec2 uvPos;
+
+      void main() {
+        uvPos = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `;
+
+    const fs = `
+      precision highp float;
+
+      varying vec2 uvPos;
+
+      uniform float time;
+      uniform float shift;
+      uniform float scale;
+      uniform float freq;
+
+      void main() {
+        float x = (uvPos.x + shift) * scale;
+        float wave = sin(x * freq - time);
+
+        float y = 0.5 + wave * 0.18;
+        float d = abs(uvPos.y - y);
+
+        float line = 1.0 - smoothstep(0.0, 0.003, d);
+
+        vec3 bg = vec3(0.08, 0.08, 0.12);
+        vec3 glow = mix(
+          vec3(1.0, 1.0, 0.0),
+          vec3(1.0, 0.0, 1.0),
+          (wave + 1.0) * 0.5
+        );
+
+        gl_FragColor = vec4(mix(bg, glow, line), 1.0);
+      }
+    `;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+    camera.position.z = 1;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.setSize(innerWidth, innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const data = {
+      time: { value: 0 },
+      shift: { value: 0 },
+      scale: { value: 0.5 },
+      freq: { value: 60 }
+    };
+
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.ShaderMaterial({
+        vertexShader: vs,
+        fragmentShader: fs,
+        uniforms: data
+      })
+    );
+
+    scene.add(plane);
+
+    const SPEED = {
+      move: 0.01,
+      zoom: 0.05,
+      freq: 0.3
+    };
+
+    const pressed = {};
+
+    addEventListener('keydown', e => pressed[e.code] = true);
+    addEventListener('keyup', e => pressed[e.code] = false);
+
+    function update() {
+      const u = data;
+
+      if (pressed.ArrowRight || pressed.KeyD) u.shift.value += SPEED.move;
+      if (pressed.ArrowLeft || pressed.KeyA) u.shift.value -= SPEED.move;
+
+      if (pressed.ArrowUp || pressed.KeyW) u.scale.value += SPEED.zoom;
+      if (pressed.ArrowDown || pressed.KeyS) u.scale.value -= SPEED.zoom;
+
+      if (pressed.Plus || pressed.PageUp) u.freq.value += SPEED.freq;
+      if (pressed.Minus || pressed.PageDown) u.freq.value -= SPEED.freq;
+
+      if (pressed.Home) {
+        u.shift.value = 0;
+        u.scale.value = 0.5;
+        u.freq.value = 60;
+        pressed.Home = false;
+      }
+
+      u.scale.value = Math.max(0.1, u.scale.value);
+      u.freq.value = Math.max(0.1, u.freq.value);
+    }
+
+    const clock = new THREE.Clock();
+
+    function render() {
+      update();
+
+      data.time.value = clock.getElapsedTime();
+
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(render);
+    }
+
+    render();
+
+    addEventListener('resize', () => {
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+
+</body>
+
+</html>
